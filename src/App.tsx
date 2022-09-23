@@ -21,11 +21,23 @@ const initialState: AppStateProps = {
   error: false
 };
 
-const useStyles = createUseStyles({
+export const useStyles = createUseStyles({
   chatContainer: {
     marginBottom: '20vh',
-    padding: 20,
+    padding: 40,
     height: '40vh'
+  },
+  chatItemContainer: {},
+  question: {
+    marginTop: '15px'
+  },
+  answer: {
+    color: 'blueviolet',
+    fontStyle: 'italic'
+  },
+  thanks: {
+    marginTop: '35px',
+    marginBottom: '15px'
   }
 });
 
@@ -123,6 +135,7 @@ const App: React.FC = () => {
       <Paper
         className={classes.chatContainer}
         elevation={3}
+        sx={{ typography: 'body1' }}
       >
         {getChatItems()}
       </Paper>
