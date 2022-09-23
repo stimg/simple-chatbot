@@ -1,4 +1,6 @@
+import { Container, Paper } from '@mui/material';
 import React from 'react';
+import { createUseStyles } from 'react-jss';
 import { ChatItem } from './ChatItem';
 import { Answer, FlowItem, OptionValue } from './types';
 
@@ -19,7 +21,16 @@ const initialState: AppStateProps = {
   error: false
 };
 
+const useStyles = createUseStyles({
+  chatContainer: {
+    marginBottom: '20vh',
+    padding: 20,
+    height: '40vh'
+  }
+});
+
 const App: React.FC = () => {
+  const classes = useStyles();
   const [state, setState] = React.useState(initialState);
 
   const fetchFlow = async () => {
@@ -108,7 +119,14 @@ const App: React.FC = () => {
   ) : state.isLoading ? (
     <div>Loading...</div>
   ) : (
-    <div>{getChatItems()}</div>
+    <Container maxWidth={'sm'}>
+      <Paper
+        className={classes.chatContainer}
+        elevation={3}
+      >
+        {getChatItems()}
+      </Paper>
+    </Container>
   );
 };
 
