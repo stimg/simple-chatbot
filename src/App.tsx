@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChatItem } from './ChatItem';
 import { Answer, FlowItem, OptionValue } from './types';
 
 interface AppStateProps {
@@ -10,7 +11,6 @@ interface AppStateProps {
 
 // Can be put in the config
 const firstItemId = 100;
-const thanksText = 'Herzlichen Dank für Ihre Angaben!';
 
 const initialState: AppStateProps = {
   isLoading: true,
@@ -41,10 +41,6 @@ const App: React.FC = () => {
       });
     }
   };
-
-  React.useEffect(() => {
-    fetchFlow();
-  }, []);
 
   const handleUserInput = (
     id: number,
@@ -86,54 +82,26 @@ const App: React.FC = () => {
     });
   };
 
-  const getControls = (flowItem: FlowItem) => {
-    return flowItem.valueOptions.map((option) => {
-      if (flowItem.uiType === 'button') {
-        return (
-          <button
-            key={option.text}
-            onClick={() =>
-              handleUserInput(
-                flowItem.id,
-                option.nextId,
-                option.value,
-                option.text
-              )
-            }
-          >
-            {option.text}
-          </button>
-        );
-      } else {
-        // Other control types
-        return null;
-      }
-    });
-  };
-
   const getChatItems = () => {
     const { flow, answers } = state;
-    return answers.map((answer) => {
+    return answers.map((answer, index) => {
       const flowItem = flow.find((item) => item.id === answer.id);
-      if (!flowItem) {
-        return (
-          <React.Fragment key={'956382a3-b6f7-4159-985e-71c0b24bca49'}>
-            <div>{thanksText}</div>
-            <div>
-              <button onClick={handleSendResult}>Absenden</button>
-            </div>
-          </React.Fragment>
-        );
-      }
 
       return (
-        <React.Fragment key={Number(answer.id)}>
-          <div>{flowItem.text}</div>
-          <div>{answer.text || getControls(flowItem)}</div>
-        </React.Fragment>
+        <ChatItem
+          key={index}
+          flowItem={flowItem}
+          answer={answer}
+          handleUserInput={handleUserInput}
+          handleSendResult={handleSendResult}
+        />
       );
     });
   };
+
+  React.useEffect(() => {
+    fetchFlow();
+  }, []);
 
   return state.error ? (
     <div>ERROR</div>
