@@ -1,66 +1,39 @@
-import { Container, Paper } from '@mui/material';
+import { Box, Container, Paper } from '@mui/material';
 import React from 'react';
-import { createUseStyles } from 'react-jss';
+import { useStyles } from './styles';
 import { ChatItem } from './ChatItem';
+import { firstItemId, getUrl, putSuccessStatus, putUrl } from './config';
 import { Answer, FlowItem, OptionValue } from './types';
 
 interface AppStateProps {
-  isLoading: boolean;
   flow: FlowItem[];
   answers: Answer[];
-  error: boolean;
+  message?: string;
 }
 
-// Can be put in the config
-const firstItemId = 100;
-
 const initialState: AppStateProps = {
-  isLoading: true,
+  message: 'Die Chat-Dateien werden heruntergeladen...',
   flow: [],
-  answers: [{ id: firstItemId }],
-  error: false
+  answers: [{ id: firstItemId }]
 };
-
-export const useStyles = createUseStyles({
-  chatContainer: {
-    marginBottom: '20vh',
-    padding: 40,
-    height: '40vh'
-  },
-  chatItemContainer: {},
-  question: {
-    marginTop: '15px'
-  },
-  answer: {
-    color: 'blueviolet',
-    fontStyle: 'italic'
-  },
-  thanks: {
-    marginTop: '35px',
-    marginBottom: '15px'
-  }
-});
 
 const App: React.FC = () => {
   const classes = useStyles();
   const [state, setState] = React.useState(initialState);
 
   const fetchFlow = async () => {
-    const response = await fetch(
-      'https://raw.githubusercontent.com/mzronek/task/main/flow.json'
-    );
+    const response = await fetch(getUrl);
     if (response.status === 200) {
       const flow = await response.json();
       setState({
         ...state,
         flow,
-        isLoading: false
+        message: undefined
       });
     } else {
       setState({
         ...state,
-        isLoading: false,
-        error: true
+        message: `Fehler ${response.status}`
       });
     }
   };
@@ -90,18 +63,25 @@ const App: React.FC = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(state.answers)
     };
-    const response = await fetch(
-      'https://virtserver.swaggerhub.com/L8475/task/1.0.1/conversation',
-      options
-    );
-    if (response.status === 204) {
-      console.log('Success');
+    const response = await fetch(putUrl, options);
+    console.debug('--> response', response);
+    if (response.status === putSuccessStatus) {
+      setState({
+        ...state,
+        message: 'Ihre Eingaben sind erfolgreich gespeichert.'
+      });
     } else {
-      console.log('Error: ', response);
+      setState({
+        ...state,
+        message: 'Es ist ein Fehler aufgetreten.'
+      });
     }
+  };
+
+  const resetChat = () => {
     setState({
       ...state,
-      answers: []
+      answers: [{ id: firstItemId }]
     });
   };
 
@@ -117,6 +97,7 @@ const App: React.FC = () => {
           answer={answer}
           handleUserInput={handleUserInput}
           handleSendResult={handleSendResult}
+          handleReset={resetChat}
         />
       );
     });
@@ -126,12 +107,21 @@ const App: React.FC = () => {
     fetchFlow();
   }, []);
 
-  return state.error ? (
-    <div>ERROR</div>
-  ) : state.isLoading ? (
-    <div>Loading...</div>
+  return state.message ? (
+    <div className={classes.message}>{state.message}</div>
   ) : (
     <Container maxWidth={'sm'}>
+      <Box
+        sx={{
+          typography: 'h2',
+          color: 'white',
+          fontWeight: 600,
+          marginBottom: '-18px',
+          textShadow: '0px -2px 3px rgba(0,0,0,0.1)'
+        }}
+      >
+        SIMPLE CHATBOT
+      </Box>
       <Paper
         className={classes.chatContainer}
         elevation={3}

@@ -1,6 +1,6 @@
 import { Box, Button } from '@mui/material';
 import React from 'react';
-import { useStyles } from './App';
+import { useStyles } from './styles';
 import { Answer, FlowItem, OptionValue } from './types';
 
 interface IChatItemsProps {
@@ -13,6 +13,7 @@ interface IChatItemsProps {
     text: string
   ) => void;
   handleSendResult: () => Promise<void>;
+  handleReset: () => void;
 }
 
 const thanksText = 'Herzlichen Dank für Ihre Angaben!';
@@ -21,7 +22,8 @@ export const ChatItem: React.FC<IChatItemsProps> = ({
   flowItem,
   answer,
   handleUserInput,
-  handleSendResult
+  handleSendResult,
+  handleReset
 }) => {
   const classes = useStyles();
   const getControls = () => {
@@ -32,7 +34,12 @@ export const ChatItem: React.FC<IChatItemsProps> = ({
         return (
           <Button
             variant={'contained'}
-            sx={{ marginRight: '10px', marginTop: '10px', padding: '3px' }}
+            sx={{
+              marginRight: '10px',
+              marginTop: '10px',
+              paddingTop: '3px',
+              paddingBottom: '3px'
+            }}
             key={option.text}
             onClick={() =>
               handleUserInput(
@@ -54,10 +61,7 @@ export const ChatItem: React.FC<IChatItemsProps> = ({
   };
 
   const getChatItem = () => (
-    <Box
-      component={'div'}
-      className={classes.chatItemContainer}
-    >
+    <Box component={'div'}>
       <Box
         component={'div'}
         className={classes.question}
@@ -82,6 +86,13 @@ export const ChatItem: React.FC<IChatItemsProps> = ({
         {thanksText}
       </Box>
       <div>
+        <Button
+          variant={'outlined'}
+          onClick={handleReset}
+          sx={{ marginRight: '10px' }}
+        >
+          Zurücksetzen
+        </Button>
         <Button
           variant={'contained'}
           onClick={handleSendResult}
