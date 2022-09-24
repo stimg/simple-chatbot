@@ -27,8 +27,10 @@ export const ChatItem: React.FC<IChatItemsProps> = ({
 }) => {
   const classes = useStyles();
   const getControls = () => {
+    // If we have false flow item id (the end of the conversation)
     if (!flowItem) return;
 
+    // Render possible input controls for the user
     return flowItem.valueOptions.map((option) => {
       if (flowItem.uiType === 'button') {
         return (
@@ -60,6 +62,7 @@ export const ChatItem: React.FC<IChatItemsProps> = ({
     });
   };
 
+  // Render question with the answer or the input controls
   const getChatItem = () => (
     <Box component={'div'}>
       <Box
@@ -72,11 +75,16 @@ export const ChatItem: React.FC<IChatItemsProps> = ({
         component={'div'}
         className={classes.answer}
       >
-        {answer.text || getControls()}
+        {
+          // Render answer, if given,
+          // or controls, if not answered yet
+          answer.text || getControls()
+        }
       </Box>
     </Box>
   );
 
+  // End of chat, final thanks and send button
   const thanksAndSend = (
     <React.Fragment key={'956382a3-b6f7-4159-985e-71c0b24bca49'}>
       <Box

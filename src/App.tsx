@@ -21,6 +21,7 @@ const App: React.FC = () => {
   const classes = useStyles();
   const [state, setState] = React.useState(initialState);
 
+  // Don't use thunks or redux toolikt because of prototype nature
   const fetchFlow = async () => {
     const response = await fetch(getUrl);
     if (response.status === 200) {
@@ -49,14 +50,18 @@ const App: React.FC = () => {
     // Flow item has false id
     if (!targetItem) return;
 
+    // Take the answer...
     targetItem.value = value;
     targetItem.text = text;
+
     setState({
       ...state,
+      // ...and continue chat
       answers: [...answers, { id: nextId }]
     });
   };
 
+  // Sure must be in the API slice in the production
   const handleSendResult = async () => {
     const options = {
       method: 'PUT',
@@ -64,7 +69,6 @@ const App: React.FC = () => {
       body: JSON.stringify(state.answers)
     };
     const response = await fetch(putUrl, options);
-    console.debug('--> response', response);
     if (response.status === putSuccessStatus) {
       setState({
         ...state,
@@ -87,6 +91,8 @@ const App: React.FC = () => {
 
   const getChatItems = () => {
     const { flow, answers } = state;
+
+    // Render only the answered questions and next one
     return answers.map((answer, index) => {
       const flowItem = flow.find((item) => item.id === answer.id);
 
@@ -104,6 +110,7 @@ const App: React.FC = () => {
   };
 
   React.useEffect(() => {
+    // Not so elegant, but no with no redux :)
     fetchFlow();
   }, []);
 
